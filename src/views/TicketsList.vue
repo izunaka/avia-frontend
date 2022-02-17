@@ -69,7 +69,7 @@
                         :min="minCost" 
                         :tick-labels="labels" 
                         tick-size="0"
-                        thumb-label="always"
+                        thumb-label="true"
                         @input="limitedFilterTickets">
                     </v-range-slider>
                 </div>
@@ -124,15 +124,14 @@
 <script>
 export default {
     name: "TicketsList",
+    props: ["where", "to", "dateNumb"],
     data() {
         return {
+            date: null,
             dialog: false,
             mobile: (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm),
             items: ["Цена ↑", "Цена ↓", "Дата отправления ↑", "Дата отправления ↓", "Дата прибытия ↑", "Дата прибытия ↓"],
             values: [],
-            where: this.$route.params.where.trim(),
-            to: this.$route.params.to.trim(),
-            date: new Date(Number(this.$route.params.date)),
             allTickets: [],
             needsTickets: [],
             value: [0, 10000],
@@ -160,7 +159,7 @@ export default {
             this.values = [];
             this.items = ["Цена ↑", "Цена ↓", "Дата отправления ↑", "Дата отправления ↓", "Дата прибытия ↑", "Дата прибытия ↓"];
             this.value = [this.minCost, this.maxCost];
-            this.limitedFilterTickets()
+            this.filterTickets()
         },
         clearMinCost() {
             this.value = [this.minCost, this.value[1]];
@@ -241,6 +240,8 @@ export default {
         },
     },
     created() {
+        this.date = new Date(Number(this.dateNumb));
+        
         this.allTickets = this.$store.getters.allTickets.filter((item) => 
             ((item.from == this.where) && (item.to == this.to) && (item.depDate >= this.date.setHours(0, 0)) && (item.depDate <= this.date.setHours(23, 59))))
         this.needsTickets = this.allTickets.slice();
