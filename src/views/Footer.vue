@@ -34,6 +34,7 @@ export default {
 }
 </script>
 
+
 <style scoped>
 footer {
   font-family: "Comic Sans MS", cursive, sans-serif;

@@ -1,9 +1,11 @@
 <template>
   <div id="app">
+    <v-app>
     <Header></Header>
     <router-view></router-view>
     <hr>
     <Footer></Footer>
+    </v-app>
   </div>
 </template>
 
@@ -19,6 +21,7 @@ export default {
   },
 }
 </script>
+
 
 <style>
 img {
