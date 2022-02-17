@@ -7,9 +7,15 @@
         <div class="container">
             <div class="filt-sort">
                 <div class="filter">
-                    <h3>Фильтр:</h3>
-                    <input v-model="minPrice" type="number" class="filt" placeholder="Минимальная цена">
-                    <input v-model="maxPrice" type="number" class="filt" placeholder="Максимальная цена">
+                    <h3>Фильтр цены:</h3>
+                    <v-range-slider 
+                        v-model="value" 
+                        :max="maxCost" 
+                        :min="minCost" 
+                        :tick-labels="labels" 
+                        tick-size="0"
+                        @input="limitedFilterTickets">
+                    </v-range-slider>
                 </div>
                 <div class="sort">
                     <h3>Сортировка:</h3>
@@ -46,7 +52,7 @@
                 </div>
             </div>
             <hr style="width: 60%">
-            <div class="item" v-for="(item, index) in ourTickets" v-bind:key="index">
+            <div class="item" v-for="(item, index) in needsTickets" v-bind:key="index">
                 <p>Город отправления: <b>{{ item.from }}</b></p>
                 <p>Город прибытия: <b>{{ item.to }}</b></p>
                 <p>Дата отправления: <b>{{ item.depDate.toLocaleDateString('ru', dateFormat) }}</b></p>
@@ -54,7 +60,7 @@
                 <p>Цена: <b>{{ item.cost }} $</b></p>
             </div>
         </div>
-        <p v-if="ourTickets.length == 0" class="not-found">
+        <p v-if="needsTickets.length == 0" class="not-found">
             К сожалению, по вашему запросу не найдено билетов.
         </p>
     </div>
@@ -68,6 +74,10 @@ export default {
             where: this.$route.params.where.trim(),
             to: this.$route.params.to.trim(),
             date: new Date(Number(this.$route.params.date)),
+            allTickets: [],
+            needsTickets: [],
+            value: [0, 10000],
+            labels: [],
             dateFormat: {
                 year: 'numeric', 
                 month: 'long', 
@@ -75,13 +85,13 @@ export default {
                 hour: 'numeric', 
                 minute: "numeric"
             },
-            ticks:  this.$store.getters.allTickets.filter((item) => 
-                ((item.from == this.where) && (item.to == this.to))),
             minPrice: "",
             maxPrice: "",
             sortPrice: "",
             sortDep: "",
             sortArr: "",
+            maxCost: 0,
+            minCost: 0,
         }
     },
     methods: {
@@ -89,27 +99,17 @@ export default {
             this.sortPrice = "";
             this.sortDep = "";
             this.sortArr = "";
-        }
+        },
+        filterTickets: function() {
+            this.needsTickets = this.allTickets.filter((item) => (item.cost >= this.value[0]));
+            this.needsTickets = this.allTickets.filter((item) => (item.cost <= this.value[1]));
+        },
     },
     computed: {
-        allTickets() {
-            let arr = this.$store.getters.allTickets;
-            let res = [];
-            for (let i = 0; i < arr.length; i++) {
-                if ((arr[i].from == this.where) && (arr[i].to == this.to) && (arr[i].depDate >= this.date.setHours(0, 0)) && (arr[i].depDate <= this.date.setHours(23, 59))) {
-                    res.push(arr[i])
-                }
-            }
-            return res;
-        },
         ourTickets() {
             let ticks = this.allTickets;
-            if (this.minPrice != "") {
-                ticks = ticks.filter((item) => (item.cost >= this.minPrice));
-            }
-            if (this.maxPrice != "") {
-                ticks = ticks.filter((item) => (item.cost <= this.maxPrice));
-            }
+            ticks = ticks.filter((item) => (item.cost >= this.value[0]));
+            ticks = ticks.filter((item) => (item.cost <= this.value[1]));
 
             if (this.sortArr == "up") {
                 ticks.sort((a, b) => (a.arrDate - b.arrDate))
@@ -128,12 +128,45 @@ export default {
             }
 
             return ticks;
+        },
+    },
+    created() {
+        this.allTickets = this.$store.getters.allTickets.filter((item) => 
+            ((item.from == this.where) && (item.to == this.to) && (item.depDate >= this.date.setHours(0, 0)) && (item.depDate <= this.date.setHours(23, 59))))
+        this.needsTickets = this.allTickets.slice();
+        let arr = this.allTickets;
+        let max = arr[0].cost;
+            for (let i = 1; i < arr.length; i++) {
+                if (arr[i].cost > max) {
+                    max = arr[i].cost;
+                }
+            }
+        this.maxCost = Math.round(max + 1);
+            let min = arr[0].cost;
+            for (let i = 1; i < arr.length; i++) {
+                if (arr[i].cost < min) {
+                    min = arr[i].cost;
+                }
+            }
+        this.minCost = Math.round(min - 1);
+        this.value = [this.minCost, this.maxCost];
+
+        let labels = [];
+        labels[this.maxCost - this.minCost] = "";
+        labels.fill("", 0 , this.maxCost - this.minCost);
+        labels[0] = this.minCost;
+        labels[this.maxCost - this.minCost] = this.maxCost;
+        labels[Math.round((this.maxCost - this.minCost) / 3)] = this.minCost + Math.round((this.maxCost - this.minCost) / 3);
+        labels[Math.round((this.maxCost - this.minCost) * 2 / 3)] = this.minCost + Math.round((this.maxCost - this.minCost) * 2 / 3);
+        this.labels = labels;
+        this.limitedFilterTickets = () => {
+            setTimeout(this.filterTickets, 500);
         }
     }
 }
 </script>
 
-<style>
+<style scoped>
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -198,7 +231,8 @@ input[type="number"] {
 
 .filt {
     width: calc(100% - 20px);
-    margin-bottom: 15px;;
+    margin-bottom: 15px;
+    background-color: white;
 }
 
 h3 {

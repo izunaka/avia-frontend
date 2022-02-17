@@ -47,7 +47,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .header-in {
   width: 100%;
   background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

@@ -1,0 +1,384 @@
+<style>
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+ul {
+  padding-left: 0;
+  margin-top: 0;
+}
+
+li {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+hr {
+	margin-top: 0;
+  margin-bottom: 20px;
+	padding: 0;
+	height: 3px;
+	border: none;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+</style>
+
+
+
+
+
+
+
+<style>
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.form-comp {
+  margin-top: -200px;
+  width: 60%;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  color: #ffffff;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+input[type="text"] {
+  display: block;
+  margin: 4px 0;
+  margin-bottom: 0;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  transition: 0.3s border-color;
+  width: 100%;
+}
+
+.form-group > input {
+  width: calc(100% - 20px);
+}
+
+input:hover {
+  border: 1px solid #aaa;
+}
+
+.button {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 10px;
+  border: none;
+  background-color: #3f5190;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 300;
+  border-radius: 5px;
+  width: 100%;
+  margin-top: 25px;
+}
+
+.button:hover {
+  border: none;
+  cursor: pointer;
+}
+
+.swap-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0 auto;
+  margin-top: 7px;
+  display: block;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  border: 3px solid #8989a7;
+  background-image: url(../assets/img/arrows.png);
+  background-size: 35px;
+  background-repeat: no-repeat;
+}
+
+.swap-btn:hover {
+  border: 3px solid #3f5190;
+  background-image: url(../assets/img/arrows.png);
+}
+
+.swap-btn:active {
+  background: #3f5190;
+}
+
+.message-error {
+  margin: 0;
+  font-size: 11px;
+  color: #aa0000;
+}
+</style>
+
+
+
+
+
+
+
+
+<style scoped>
+footer {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;  
+}
+
+.footer__header {
+  margin-bottom: 5px;
+}
+
+.footer__telephone,
+.footer__about {
+  text-align: center;
+  flex-grow: 1;
+  max-width: 500px;
+}
+
+.footer__about {
+  margin-left: 10px;
+}
+
+</style>
+
+
+
+
+
+
+
+
+<style scoped>
+.header-in {
+  width: 100%;
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #FFFFFF;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  flex-direction: row-reverse;
+  justify-content: space-around;
+  align-items: center;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  text-transform: uppercase;
+}
+
+.header__header,
+.header__inst,
+.header__telephone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 7px 20px;
+}
+
+.header__header-text {
+    font-weight: 300;
+    font-size: 34px;
+}
+
+.header__header-img {
+  margin-right: 15px;
+  width: 36px;
+  height: 36px;
+}
+
+.header__inst-img {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+.header__telephone-img {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+</style>
+
+
+
+
+
+
+
+<style scoped>
+
+  .home {
+    display: flex;
+    background-image: url(../assets/img/bg.png);
+    background-position: 100% 50%;
+    background-size: 800px;
+    background-repeat: no-repeat;
+    height: 700px;
+  }
+
+  .home__img,
+  .home__form {
+    flex-grow: 1;
+  }
+
+  .home__img{
+    max-width: 60%;
+  }
+  .home__form {
+    max-width: 40%;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .home__img {
+      display: none;
+    }
+    .home__form {
+      max-width: 100%;
+    }
+  }
+
+</style>
+
+
+
+
+
+
+
+
+<style scoped>
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+input[type="number"]:hover,
+input[type="number"]:focus {
+    -moz-appearance: number-input;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    display:block;
+    padding: 10px 10px;
+    border-radius:10px;
+    border: 1px solid #eee;
+    transition: .3s border-color;
+    width: 100%;
+}
+
+.header-in-2 {
+    text-align: center;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-weight: 300;
+    font-size: 26px;
+    margin-top: 0px;
+    padding-top: 20px;
+    margin-bottom: 4px;
+    color: #764ba2;
+}
+
+.main-div {
+    margin-top: 0px;
+    width: 100%;
+    background: rgb(209, 230, 255);
+}
+
+.filt-sort {
+    margin-bottom: 15px;
+    width: 60%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.filter, .sort {
+    width: 40%;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 14px;
+    font-weight: 100;
+    color: #764ba2;
+}
+
+.filt {
+    width: calc(100% - 20px);
+    margin-bottom: 15px;;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.item {
+    background: #FFFFFF;
+    margin-bottom: 20px;
+    width: 60%;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 16px;
+    color: #764ba2;
+    box-shadow: 0 15px 30px 0 rgba(0,0,0,0.11),
+    0 5px 15px 0 rgba(0,0,0,0.08);
+    border-radius: 0.5rem;
+    border-left: 0 solid #00ff99;
+    transition: border-left 300ms ease-in-out;
+    padding: 15px 30px;
+}
+
+.item > p > b {
+    font-size: 20px;
+}
+
+.not-found {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 16px;
+    color: #764ba2;
+    text-align: center;
+    padding-bottom: 20px;
+    margin: 0 auto;
+}
+
+.item>p:nth-child(even) {
+    margin-left: 55%;
+}
+
+.item>p:nth-child(odd) {
+    margin-right: 55%;
+}
+
+@media screen and (max-width: 900px) {
+    .item, 
+    .filt-sort {
+        width: 80%;
+    }
+}
+
+
+
+</style>

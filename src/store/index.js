@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    city: ['Лондон', 'Москва', 'Париж'],
     tickets: [
       {
         from: "Лондон",
@@ -11771,6 +11772,9 @@ export default new Vuex.Store({
   getters: {
     allTickets(state) {
       return state.tickets;
+    },
+    allCity(state) {
+      return state.city;
     }
   },
   mutations: {
