@@ -145,7 +145,7 @@ export default {
   margin-bottom: 10px;
 }
 
-input[type="text"] {
+.form-group input[type="text"] {
   background: white;
   display: block;
   margin: 4px 0;
@@ -158,7 +158,7 @@ input[type="text"] {
   height: 30px;
 }
 
-input:hover {
+.form-group input:hover {
   border: 1px solid #aaa;
 }
 
@@ -174,7 +174,6 @@ input:hover {
   font-weight: 300;
   border-radius: 5px;
   width: 100%;
-  margin-top: 25px;
 }
 
 .button:hover {

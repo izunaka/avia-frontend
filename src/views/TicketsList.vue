@@ -3,9 +3,64 @@
         <div class="list-header">
             <h2 class="header-in-2">Билеты по вашему запросу</h2>
         </div>
-        <hr style="width: 60%">
         <div class="container">
-            <div class="filt-sort">
+            <v-dialog
+                v-model="dialog"
+                max-width="600"
+                v-if="mobile">
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        v-bind="attrs"
+                        v-on="on">
+                        Фильтры и сортировка
+                    </v-btn>
+                </template>
+                    <v-card>
+                        <v-card-title>
+                        <span class="text-h5">Фильтры и сортировка</span>
+                        </v-card-title>
+                        <v-card-text>
+                            <v-container>
+                                <v-row>
+                                    <v-col cols="12">
+                                        <v-range-slider 
+                                            v-model="value" 
+                                            :max="maxCost" 
+                                            :min="minCost" 
+                                            :tick-labels="labels" 
+                                            :thumb-label="true"
+                                            :tick-size="0"
+                                            @input="limitedFilterTickets">
+                                        </v-range-slider>
+                                    </v-col>
+                                    <v-col cols="12">
+                                        <v-autocomplete
+                                            v-model="values"
+                                            :items="items"
+                                            outlined
+                                            dense
+                                            chips
+                                            small-chips
+                                            label="Сортировка"
+                                            multiple
+                                            @change="changeItems">
+                                        </v-autocomplete>
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                        </v-card-text>
+                        <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="dialog = false">
+                            Готово
+                        </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            <div class="filt-sort" v-if="!mobile">
                 <div class="filter">
                     <h3>Фильтр цены:</h3>
                     <v-range-slider 
@@ -14,44 +69,44 @@
                         :min="minCost" 
                         :tick-labels="labels" 
                         tick-size="0"
+                        thumb-label="always"
                         @input="limitedFilterTickets">
                     </v-range-slider>
                 </div>
                 <div class="sort">
                     <h3>Сортировка:</h3>
-                    <ul>
-                        <li>
-                            По цене:
-                            <br>
-                            <input type="radio" id="priceUp" value="up" v-model="sortPrice">
-                            <label for="priceUp">по возрастанию</label>
-                            <br>
-                            <input type="radio" id="priceDown" value="down" v-model="sortPrice">
-                            <label for="priceDown">по убыванию</label>
-                        </li>
-                        <li>
-                            По дате отправления:
-                            <br>
-                            <input type="radio" id="depUp" value="up" v-model="sortDep">
-                            <label for="depUp">по возрастанию</label>
-                            <br>
-                            <input type="radio" id="depDown" value="down" v-model="sortDep">
-                            <label for="depUp">по убыванию</label>
-                        </li>
-                        <li>
-                            По дате прибытия:
-                            <br>
-                            <input type="radio" id="arrUp" value="up" v-model="sortArr">
-                            <label for="arrUp">по возрастанию</label>
-                            <br>
-                            <input type="radio" id="arrDown" value="down" v-model="sortArr">
-                            <label for="arrDown">по убыванию</label>
-                        </li>
-                    </ul>
+                    <v-autocomplete
+                        v-model="values"
+                        :items="items"
+                        outlined
+                        dense
+                        chips
+                        small-chips
+                        label="Сортировка"
+                        multiple
+                        @change="changeItems">
+                    </v-autocomplete>
                     <button class="button" style="width: 40%" v-on:click="clear">Сбросить</button>
                 </div>
             </div>
-            <hr style="width: 60%">
+            <div class="text-center" v-if="mobile">
+                <v-chip v-if="value[0] != minCost" class="ma-2" color="green" text-color="white" close @click="clearMinCost" @click:close="clearMinCost">
+                    Минимальная цена: {{ value[0] }}
+                </v-chip>
+                <v-chip v-if="value[1] != maxCost" class="ma-2" color="green" text-color="white" close @click="clearMaxCost" @click:close="clearMaxCost">
+                    Максимальная цена: {{ value[1] }}
+                </v-chip>
+            </div>
+            <div class="text-center" v-if="mobile">
+                <v-chip v-for="(item, index) in values" :key="index" class="ma-2" close color="primary" @click="clearFilter(item)" @click:close="clearFilter(item)">
+                    {{ item }}
+                </v-chip>
+            </div>
+            <div class="text-center" v-if="mobile">
+                <v-chip v-if="options" class="ma-2" color="red"  text-color="white" @click="clear">
+                    Сбросить
+                </v-chip>
+            </div>
             <div class="item" v-for="(item, index) in needsTickets" v-bind:key="index">
                 <p>Город отправления: <b>{{ item.from }}</b></p>
                 <p>Город прибытия: <b>{{ item.to }}</b></p>
@@ -71,6 +126,10 @@ export default {
     name: "TicketsList",
     data() {
         return {
+            dialog: false,
+            mobile: (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm),
+            items: ["Цена ↑", "Цена ↓", "Дата отправления ↑", "Дата отправления ↓", "Дата прибытия ↑", "Дата прибытия ↓"],
+            values: [],
             where: this.$route.params.where.trim(),
             to: this.$route.params.to.trim(),
             date: new Date(Number(this.$route.params.date)),
@@ -85,49 +144,100 @@ export default {
                 hour: 'numeric', 
                 minute: "numeric"
             },
-            minPrice: "",
-            maxPrice: "",
-            sortPrice: "",
-            sortDep: "",
-            sortArr: "",
             maxCost: 0,
             minCost: 0,
+            timerIdSort: -1,
+            timerIdFilter: -1,
+        }
+    },
+    computed: {
+        options() {
+            return (this.values.length != 0) || (this.value[0] != this.minCost) || (this.value[1] != this.maxCost);
         }
     },
     methods: {
         clear() {
-            this.sortPrice = "";
-            this.sortDep = "";
-            this.sortArr = "";
+            this.values = [];
+            this.items = ["Цена ↑", "Цена ↓", "Дата отправления ↑", "Дата отправления ↓", "Дата прибытия ↑", "Дата прибытия ↓"];
+            this.value = [this.minCost, this.maxCost];
+            this.limitedFilterTickets()
         },
-        filterTickets: function() {
+        clearMinCost() {
+            this.value = [this.minCost, this.value[1]];
+            this.filterTickets();
+        },
+        clearMaxCost() {
+            this.value = [this.value[0], this.maxCost];
+            this.filterTickets();
+        },
+        clearFilter(filt) {
+            this.values = this.values.filter((item) => (item != filt));
+            this.changeItems();
+        },
+        filterTickets() {
             this.needsTickets = this.allTickets.filter((item) => (item.cost >= this.value[0]));
-            this.needsTickets = this.allTickets.filter((item) => (item.cost <= this.value[1]));
+            this.needsTickets = this.needsTickets.filter((item) => (item.cost <= this.value[1]));
+            this.sortTickets();
         },
-    },
-    computed: {
-        ourTickets() {
-            let ticks = this.allTickets;
-            ticks = ticks.filter((item) => (item.cost >= this.value[0]));
-            ticks = ticks.filter((item) => (item.cost <= this.value[1]));
-
-            if (this.sortArr == "up") {
-                ticks.sort((a, b) => (a.arrDate - b.arrDate))
-            } else if (this.sortArr == "down") {
-                ticks.sort((a, b) => (b.arrDate - a.arrDate))
+        changeItems() {
+            for (let i = this.values.length - 1; i >= 0; i--) {
+                if (this.values[i] == "Дата прибытия ↓") {
+                    this.items = this.items.filter((item) => (item != "Дата прибытия ↑"));
+                } else if (this.values[i] == "Дата прибытия ↑") {
+                    this.items = this.items.filter((item) => (item != "Дата прибытия ↓"));
+                }
+                if (this.values[i] == "Дата отправления ↓") {
+                    this.items = this.items.filter((item) => (item != "Дата отправления ↑"));
+                } else if (this.values[i] == "Дата отправления ↑") {
+                    this.items = this.items.filter((item) => (item != "Дата отправления ↓"));
+                }
+                if (this.values[i] == "Цена ↓") {
+                    this.items = this.items.filter((item) => (item != "Цена ↑"));
+                } else if (this.values[i] == "Цена ↑") {
+                    this.items = this.items.filter((item) => (item != "Цена ↓"));
+                }
             }
-            if (this.sortDep == "up") {
-                ticks.sort((a, b) => (a.depDate - b.depDate))
-            } else if (this.sortDep == "down") {
-                ticks.sort((a, b) => (b.depDate - a.depDate))
+            if ((this.values.indexOf("Дата прибытия ↑") == -1) && (this.items.indexOf("Дата прибытия ↓")) == -1) {
+                this.items = [...this.items, "Дата прибытия ↓"];
             }
-            if (this.sortPrice == "up") {
-                ticks.sort((a, b) => (a.cost - b.cost))
-            } else if (this.sortPrice == "down") {
-                ticks.sort((a, b) => (b.cost - a.cost))
+            if ((this.values.indexOf("Дата прибытия ↓") == -1) && (this.items.indexOf("Дата прибытия ↑")) == -1) {
+                this.items = [...this.items, "Дата прибытия ↑"];
             }
-
-            return ticks;
+            if ((this.values.indexOf("Дата отправления ↑") == -1) && (this.items.indexOf("Дата отправления ↓")) == -1) {
+                this.items = [...this.items, "Дата отправления ↓"];
+            }
+            if ((this.values.indexOf("Дата отправления ↓") == -1) && (this.items.indexOf("Дата отправления ↑")) == -1) {
+                this.items = [...this.items, "Дата отправления ↑"];
+            }
+            if ((this.values.indexOf("Цена ↑") == -1) && (this.items.indexOf("Цена ↓")) == -1) {
+                this.items = [...this.items, "Цена ↓"];
+            }
+            if ((this.values.indexOf("Цена ↓") == -1) && (this.items.indexOf("Цена ↑")) == -1) {
+                this.items = [...this.items, "Цена ↑"];
+            }
+            this.limitedSortTickets();
+        },
+        sortTickets() {
+            for (let i = this.values.length - 1; i >= 0; i--) {
+                if (this.values[i] == "Дата прибытия ↓") {
+                    this.needsTickets.sort((a, b) => (a.arrDate - b.arrDate));
+                } else if (this.values[i] == "Дата прибытия ↑") {
+                    this.needsTickets.sort((a, b) => (b.arrDate - a.arrDate));
+                }
+                if (this.values[i] == "Дата отправления ↓") {
+                    this.needsTickets.sort((a, b) => (a.depDate - b.depDate));
+                } else if (this.values[i] == "Дата отправления ↑") {
+                    this.needsTickets.sort((a, b) => (b.depDate - a.depDate));
+                }
+                if (this.values[i] == "Цена ↓") {
+                    this.needsTickets.sort((a, b) => (a.cost - b.cost));
+                } else if (this.values[i] == "Цена ↑") {
+                    this.needsTickets.sort((a, b) => (b.cost - a.cost));
+                }
+            }
+        },
+        updateWidth() {
+            this.mobile = (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm);
         },
     },
     created() {
@@ -159,42 +269,22 @@ export default {
         labels[Math.round((this.maxCost - this.minCost) / 3)] = this.minCost + Math.round((this.maxCost - this.minCost) / 3);
         labels[Math.round((this.maxCost - this.minCost) * 2 / 3)] = this.minCost + Math.round((this.maxCost - this.minCost) * 2 / 3);
         this.labels = labels;
+
         this.limitedFilterTickets = () => {
-            setTimeout(this.filterTickets, 500);
+            clearTimeout(this.timerIdFilter);
+            this.timerIdFilter = setTimeout(this.filterTickets, 500);
         }
+        this.limitedSortTickets = () => {
+            clearTimeout(this.timerIdSort);
+            this.timerIdSort = setTimeout(this.sortTickets, 500);
+        }
+
+        window.addEventListener('resize', this.updateWidth);
     }
 }
 </script>
 
 <style scoped>
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-input[type="number"]:hover,
-input[type="number"]:focus {
-    -moz-appearance: number-input;
-}
-
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    display:block;
-    padding: 10px 10px;
-    border-radius:10px;
-    border: 1px solid #eee;
-    transition: .3s border-color;
-    width: 100%;
-}
 
 .header-in-2 {
     text-align: center;
@@ -215,7 +305,7 @@ input[type="number"] {
 
 .filt-sort {
     margin-bottom: 15px;
-    width: 60%;
+    width: 80%;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -248,8 +338,9 @@ h3 {
 
 .item {
     background: #FFFFFF;
-    margin-bottom: 20px;
-    width: 60%;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 80%;
     font-family: "Comic Sans MS", cursive, sans-serif;
     font-size: 16px;
     color: #764ba2;
@@ -282,13 +373,11 @@ h3 {
     margin-right: 55%;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1000px) {
     .item, 
     .filt-sort {
         width: 80%;
     }
 }
-
-
 
 </style>
