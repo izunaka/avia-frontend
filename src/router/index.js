@@ -12,9 +12,10 @@ const routes = [
     component: Home
   },
   {
-    path: '/list/:where/:to/:date',
+    path: '/list/:where/:to/:dateNumb',
     name: 'TicketsList',
-    component: TicketsList
+    component: TicketsList,
+    props: true,
   }
 ]
 
